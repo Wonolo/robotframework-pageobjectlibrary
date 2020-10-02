@@ -107,7 +107,7 @@ class PageObjectLibraryKeywords(object):
         Note: If the page object has already been imported, it won't be imported again.
         """
         if len(args) > 0:
-            self.builtin.import_library(page_name, *args)
+            self.builtin.import_library(page_name, args)
             page = self.builtin.get_library_instance(page_name)
         else:
             try:

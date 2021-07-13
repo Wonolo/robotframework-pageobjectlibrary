@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from abc import ABCMeta
+from datetime import timedelta
 from contextlib import contextmanager
 import warnings
 import robot.api
@@ -83,10 +84,7 @@ class PageObject(six.with_metaclass(ABCMeta, object)):
         '''
         if hasattr(self.selib, "driver"):
             return self.selib.driver
-        elif hasattr(self.selib, "_current_browser"):
-            return self.selib._current_browser()
-        else:
-            raise Exception("unable to find 'driver' or '_current browser' attribute of SeleniumLibrary")
+        raise Exception("unable to find 'driver' attribute of SeleniumLibrary")
     
     def __str__(self):
         return self.__class__.__name__
@@ -105,13 +103,14 @@ class PageObject(six.with_metaclass(ABCMeta, object)):
         2) the javascript document.readyState variable to be set
            to "complete"
         """
-        old_page = self.browser.find_element_by_tag_name('html')
+        old_page = self.driver.find_element_by_tag_name('html')
         yield
-        WebDriverWait(self.browser, timeout).until(
+        WebDriverWait(self.driver, timeout).until(
             staleness_of(old_page),
             message="Old page did not go stale within %ss" % timeout
         )
-        self.selib.wait_for_condition("return (document.readyState == 'complete')", timeout=10)
+        self.selib.wait_for_condition("return (document.readyState == 'complete')",
+                                      timeout=timedelta(seconds=timeout))
 
     def _is_current_page(self):
         """Determine if this page object represents the current page.
@@ -136,4 +135,3 @@ class PageObject(six.with_metaclass(ABCMeta, object)):
         self.logger.info("  actual title: '%s'" % actual_title)
         raise Exception(
             "expected title to be '%s' but it was '%s'" % (expected_title, actual_title))
-        return False

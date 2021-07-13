@@ -60,7 +60,7 @@ class PageObjectLibraryKeywords(object):
         # If we get here, we're not on the page we think we're on
         raise Exception("Expected page to be %s but it was not" % page_name)
 
-    def go_to_page(self, page_name, *args, page_root=None):
+    def go_to_page(self, page_name, *args, page_root=None, timeout=10):
         """Go to the url for the given page object.
 
         Unless explicitly provided, the URL root will be based on the
@@ -95,7 +95,7 @@ class PageObjectLibraryKeywords(object):
         (scheme, netloc, path, parameters, query, fragment) = urlparse(url)
         url = "%s://%s%s" % (scheme, netloc, page.get_page_url())
 
-        with page._wait_for_page_refresh():
+        with page._wait_for_page_refresh(timeout=timeout):
             page.selib.go_to(url)
         # should I be calling this keyword? Should this keyword return
         # true/false, or should it throw an exception?
